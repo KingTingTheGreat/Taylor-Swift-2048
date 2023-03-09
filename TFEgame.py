@@ -121,9 +121,10 @@ class TFEgame:
 
         return eval(directions[m])
 
-    def move(self) -> str:
+    def move(self, key=None) -> str:
         """ gets user input for the next move """
-        key = self._get_key_input()
+        if key is None:
+            key = self._get_key_input()
         changed = self._do_move(key)
         if changed:
             self._add_random()
