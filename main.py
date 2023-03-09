@@ -99,17 +99,19 @@ def process_events(only_quit=False) -> None:
                 pygame.quit()
                 sys.exit()
 
+if __name__ == '__main__':
+    # playing the game
+    while GAME.is_playable():
+        SCREEN.fill('white')
+        process_events()
+        blit_all()
+        pygame.display.update()
+        GAME.move()
+        CLOCK.tick(60)
 
-while GAME.is_playable():
-    SCREEN.fill('white')
-    process_events()
-    blit_all()
-    pygame.display.update()
-    GAME.move()
-    CLOCK.tick(60)
-
-while True:
-    process_events(only_quit=True)
-    blit_all()
-    pygame.display.update()
-    CLOCK.tick(60)
+    # keeping the screen active after the game is over
+    while True:
+        process_events(only_quit=True)
+        blit_all()
+        pygame.display.update()
+        CLOCK.tick(60)
