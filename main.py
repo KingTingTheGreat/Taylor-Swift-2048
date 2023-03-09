@@ -102,11 +102,10 @@ def process_events(only_quit=False) -> None:
 if __name__ == '__main__':
     # playing the game
     while GAME.is_playable():
-        SCREEN.fill('white')
         process_events()
+        SCREEN.fill('white')
         blit_all()
         pygame.display.update()
-        GAME.move()
         CLOCK.tick(60)
 
     # keeping the screen active after the game is over
