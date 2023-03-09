@@ -15,8 +15,13 @@ if __name__ == '__main__':
     SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
     SCREEN.fill('white')
 
+    # set up tile colors
+    COLORS = {0:'#ffffff', 2:'#cc0001', 4:'#fb940b', 8:'#ffff01', \
+              16:'#01cc00', 32:'#03c0c6', 64:'#0000fe', 128:'#762ca7', \
+              256: '#fe98bf', 512: '#fe98bf', 1024: '#fe98bf', 2048: '#fe98bf'}
+
     # set up fonts
-    FONT = pygame.font.Font('fonts\Sequoia Regular.otf', 75)
+    FONT = pygame.font.Font('fonts\Sequoia Regular.otf', 65)
 
     # set up clock
     CLOCK = pygame.time.Clock()
@@ -40,19 +45,59 @@ if __name__ == '__main__':
     OUTLINE.fill('black')
     OUTLINE_RECT = OUTLINE.get_rect(center=(WIDTH//2, HEIGHT//2))
 
+def blit_title() -> None:
+    title = FONT.render('Taylor Swift 2048', True, 'black')
+    title_rect = title.get_rect(center=(WIDTH//2, 100))
+    SCREEN.blit(title, title_rect)
 
-def blit_tiles() -> None:
+def blit_score() -> None:
+    score = FONT.render(f'Score: {str(GAME.score())}', True, 'black')
+    score_rect = score.get_rect(center=(WIDTH//2, 700))
+    SCREEN.blit(score, score_rect)
+
+
+def blit_tiles(board) -> None:
     for coord in TILES:
-        TILES[coord].fill((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
+        TILES[coord].fill(COLORS[board[coord]])
         SCREEN.blit(TILES[coord], TILES_RECTS[coord])
 
-while True:
+def process_events(only_quit=False) -> None:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-    SCREEN.blit(OUTLINE, OUTLINE_RECT)
-    blit_tiles()
-    pygame.display.update()
-    CLOCK.tick(10)
+        if only_quit:
+            continue
+        if event.type == pygame.KEYDOWN:
+            key = event.key
+            if key == pygame.K_w or key == pygame.K_UP:
+                GAME.move('w')
+            if key == pygame.K_a or key == pygame.K_LEFT:
+                GAME.move('a')
+            if key == pygame.K_s or key == pygame.K_DOWN:
+                GAME.move('s')
+            if key == pygame.K_d or key == pygame.K_RIGHT:
+                GAME.move('d')
+            if event.key == pygame.K_RETURN:
+                pygame.quit()
+                sys.exit()
 
+while GAME.is_playable():
+    SCREEN.fill('white')
+    process_events()
+    SCREEN.blit(OUTLINE, OUTLINE_RECT)
+    blit_tiles(GAME.board())
+    blit_title()
+    blit_score()
+    pygame.display.update()
+    GAME.move()
+    CLOCK.tick(60)
+
+while True:
+    process_events(only_quit=True)
+    SCREEN.blit(OUTLINE, OUTLINE_RECT)
+    blit_tiles(GAME.board())
+    blit_title()
+    blit_score()
+    pygame.display.update()
+    CLOCK.tick(60)
