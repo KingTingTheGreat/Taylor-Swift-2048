@@ -19,9 +19,14 @@ if __name__ == '__main__':
     COLORS = {0:'#ffffff', 2:'#cc0001', 4:'#fb940b', 8:'#ffff01', \
               16:'#01cc00', 32:'#03c0c6', 64:'#0000fe', 128:'#762ca7', \
               256: '#fe98bf', 512: '#fe98bf', 1024: '#fe98bf', 2048: '#fe98bf'}
-    ALBUMS = {0: ' ', 2: 'Fearless', 4: 'Speak Now', 8: 'Red', \
-                16: '1989', 32: 'Reputation', 64: 'Lover', 128: 'Folklore', \
-                256: 'Evermore', 512: 'Folklore', 1024: 'Midnights', 2048: 'ME!'}
+    ALBUMS = {0: '_', 2: 'TaylorSwift', 4: 'Fearless', 8: 'SpeakNow', \
+            16: 'Red', 32: '1989', 64: 'Reputation', 128: 'Lover', \
+            256: 'folklore', 512: 'evermore', 1024: 'Midnights', 2048: 'ME!'}
+    for val in ALBUMS:
+        img = pygame.image.load(f'tiles\{ALBUMS[val]}.png').convert_alpha()
+        ALBUMS[val] = pygame.transform.scale(img, (100, 100))
+
+
 
     # set up fonts
     FONT = pygame.font.Font('fonts\Sequoia Regular.otf', 65)
@@ -61,8 +66,7 @@ def blit_score() -> None:
 
 def blit_tiles(board) -> None:
     for coord in TILES:
-        TILES[coord].fill(COLORS[board[coord]])
-        SCREEN.blit(TILES[coord], TILES_RECTS[coord])
+        SCREEN.blit(ALBUMS[board[coord]], TILES_RECTS[coord])
 
 def process_events(only_quit=False) -> None:
     for event in pygame.event.get():
