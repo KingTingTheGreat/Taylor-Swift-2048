@@ -15,14 +15,6 @@ if __name__ == '__main__':
     SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
     SCREEN.fill('white')
 
-    # set up tile 
-    # COLORS = {0:'#ffffff', 2:'#cc0001', 4:'#fb940b', 8:'#ffff01', \
-    #           16:'#01cc00', 32:'#03c0c6', 64:'#0000fe', 128:'#762ca7', \
-    #           256: '#fe98bf', 512: '#fe98bf', 1024: '#fe98bf', 2048: '#fe98bf'}
-
-
-
-
     # set up fonts
     FONT = pygame.font.Font('fonts\Sequoia Regular.otf', 65)
 
@@ -46,7 +38,7 @@ if __name__ == '__main__':
     TILES_RECTS = {(i, j): ALBUMS[0].get_rect(center=((x_center + (TILE_DIM+TILE_SPACING)*(j-1.5), y_center + (TILE_DIM+TILE_SPACING)*(i-1.5)))) \
                     for j in range(DIMS[1]) for i in range(DIMS[0])}
 
-
+    # set up outline of tiles
     OUTLINE_DIM = TILE_DIM*DIMS[0]+TILE_SPACING*(DIMS[0]-1)+2*TILE_SPACING
     OUTLINE = pygame.Surface((OUTLINE_DIM, OUTLINE_DIM))
     OUTLINE.fill('black')
@@ -54,24 +46,27 @@ if __name__ == '__main__':
 
 
 def blit_title() -> None:
+    """ blits the title """
     title = FONT.render('Taylor Swift 2048', True, 'black')
     title_rect = title.get_rect(center=(WIDTH//2, 100))
     SCREEN.blit(title, title_rect)
 
 
 def blit_score() -> None:
+    """ blits the score """
     score = FONT.render(f'Score: {str(GAME.score())}', True, 'black')
     score_rect = score.get_rect(center=(WIDTH//2, 700))
     SCREEN.blit(score, score_rect)
 
 
 def blit_tiles(board) -> None:
+    """ blits the tiles of the board """
     for coord in TILES_RECTS:
-        # TILES[coord] = ALBUMS[board[coord]]
         SCREEN.blit(ALBUMS[board[coord]], TILES_RECTS[coord])
 
 
 def blit_all() -> None:
+    """ blits all the elements of the game """
     SCREEN.blit(OUTLINE, OUTLINE_RECT)
     blit_tiles(GAME.board())
     blit_title()
@@ -79,6 +74,8 @@ def blit_all() -> None:
 
 
 def process_events(only_quit=False) -> None:
+    """ processes events 
+    only_quit: if True, only the quit event is processed """
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -98,6 +95,7 @@ def process_events(only_quit=False) -> None:
             if event.key == pygame.K_RETURN:
                 pygame.quit()
                 sys.exit()
+
 
 if __name__ == '__main__':
     # playing the game
