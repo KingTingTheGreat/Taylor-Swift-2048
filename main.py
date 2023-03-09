@@ -19,6 +19,9 @@ if __name__ == '__main__':
     COLORS = {0:'#ffffff', 2:'#cc0001', 4:'#fb940b', 8:'#ffff01', \
               16:'#01cc00', 32:'#03c0c6', 64:'#0000fe', 128:'#762ca7', \
               256: '#fe98bf', 512: '#fe98bf', 1024: '#fe98bf', 2048: '#fe98bf'}
+    ALBUMS = {0: ' ', 2: 'Fearless', 4: 'Speak Now', 8: 'Red', \
+                16: '1989', 32: 'Reputation', 64: 'Lover', 128: 'Folklore', \
+                256: 'Evermore', 512: 'Folklore', 1024: 'Midnights', 2048: 'ME!'}
 
     # set up fonts
     FONT = pygame.font.Font('fonts\Sequoia Regular.otf', 65)
