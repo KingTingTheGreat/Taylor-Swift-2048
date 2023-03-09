@@ -151,7 +151,7 @@ class TFEgame:
                 return True
         return False
     
-    def playable(self) -> bool:
+    def is_playable(self) -> bool:
         """ returns a boolean indicating whether the game is playable """
         return self.can_move() or not self.won()
     
@@ -166,7 +166,7 @@ class TFEgame:
     def play(self) -> bool:
         """ the game loop """
         self._gen_starting_tiles()
-        while self.playable():
+        while self.is_playable():
             print(f'Score: {self._score} \t Moves: {self._moves}')
             print(self, '\n')
             self.move()
