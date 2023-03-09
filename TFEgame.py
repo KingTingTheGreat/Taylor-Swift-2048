@@ -151,6 +151,10 @@ class TFEgame:
                 return True
         return False
     
+    def playable(self) -> bool:
+        """ returns a boolean indicating whether the game is playable """
+        return self.can_move() or not self.won()
+    
     def won(self) -> bool:
         """ returns a boolean indicating whether the game has been won, 10/2048 has been reached """
         return np.amax(self._board) == 2048
@@ -162,7 +166,7 @@ class TFEgame:
     def play(self) -> bool:
         """ the game loop """
         self._gen_starting_tiles()
-        while self.can_move() and not self.won():
+        while self.playable():
             print(f'Score: {self._score} \t Moves: {self._moves}')
             print(self, '\n')
             self.move()
