@@ -16,7 +16,7 @@ if __name__ == '__main__':
     SCREEN.fill('white')
 
     # set up fonts
-    # FONT = pygame.font.Font('tbd', 75)
+    FONT = pygame.font.Font('fonts\Sequoia Regular.otf', 75)
 
     # set up clock
     CLOCK = pygame.time.Clock()
@@ -47,8 +47,12 @@ def blit_tiles() -> None:
         SCREEN.blit(TILES[coord], TILES_RECTS[coord])
 
 while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
     SCREEN.blit(OUTLINE, OUTLINE_RECT)
     blit_tiles()
     pygame.display.update()
-    CLOCK.tick(60)
+    CLOCK.tick(10)
 
