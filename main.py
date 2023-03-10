@@ -26,16 +26,20 @@ if __name__ == '__main__':
     GAME = TFEgame(DIMS)
     BOARD = GAME.board()
 
-    # set up tiles and corresponding rects
+    # set up tile images and corresponding rects
     ALBUMS = {0: '_', 2: 'TaylorSwift', 4: 'Fearless', 8: 'SpeakNow', \
             16: 'Red', 32: '1989', 64: 'Reputation', 128: 'Lover', \
-            256: 'folklore', 512: 'evermore', 1024: 'Midnights', 2048: 'ME!'}
+            256: 'folklore', 512: 'evermore', 1024: 'Midnights', 2048: 'END'}
+    ALBUM_IMAGES = {}
     for val in ALBUMS:
-        img = pygame.image.load(f'tiles\{ALBUMS[val]}.png').convert_alpha()
-        ALBUMS[val] = pygame.transform.scale(img, (100, 100))
+        album = ALBUMS[val]
+        if album == 'END':
+            album = 'ME!'
+        img = pygame.image.load(f'tiles\{album}.png').convert_alpha()
+        ALBUM_IMAGES[val] = pygame.transform.scale(img, (100, 100))
     TILE_DIM = 100
     TILE_SPACING = 10
-    TILES_RECTS = {(i, j): ALBUMS[0].get_rect(center=((x_center + (TILE_DIM+TILE_SPACING)*(j-1.5), y_center + (TILE_DIM+TILE_SPACING)*(i-1.5)))) \
+    TILES_RECTS = {(i, j): ALBUM_IMAGES[0].get_rect(center=((x_center + (TILE_DIM+TILE_SPACING)*(j-1.5), y_center + (TILE_DIM+TILE_SPACING)*(i-1.5)))) \
                     for j in range(DIMS[1]) for i in range(DIMS[0])}
 
     # set up outline of tiles
@@ -43,6 +47,12 @@ if __name__ == '__main__':
     OUTLINE = pygame.Surface((OUTLINE_DIM, OUTLINE_DIM))
     OUTLINE.fill('black')
     OUTLINE_RECT = OUTLINE.get_rect(center=(WIDTH//2, HEIGHT//2))
+
+    # set up song
+    current_song = ALBUMS[GAME.max_tile()]  # song will either be from TaylorSwift or from Fearless
+    pygame.mixer.music.set_volume(0.8)
+    pygame.mixer.music.load(f'songs\{current_song}.mp3')
+    pygame.mixer.music.play()
 
 
 def blit_title() -> None:
@@ -62,7 +72,7 @@ def blit_score() -> None:
 def blit_tiles(board) -> None:
     """ blits the tiles of the board """
     for coord in TILES_RECTS:
-        SCREEN.blit(ALBUMS[board[coord]], TILES_RECTS[coord])
+        SCREEN.blit(ALBUM_IMAGES[board[coord]], TILES_RECTS[coord])
 
 
 def blit_all() -> None:
@@ -71,6 +81,20 @@ def blit_all() -> None:
     blit_tiles(GAME.board())
     blit_title()
     blit_score()
+
+
+def play_song(current_song) -> str:
+    """ plays the song corresponding to the current max score """
+    next_song = ALBUMS[GAME.max_tile()]
+    if current_song == '_' or current_song == next_song:
+        return current_song
+    current_song = next_song
+    if current_song == 'END':
+        current_song = 'ME!'
+    pygame.mixer.music.load(f'songs\{current_song}.mp3')
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play()
+    return current_song
 
 
 def process_events(only_quit=False) -> None:
@@ -86,13 +110,13 @@ def process_events(only_quit=False) -> None:
             key = event.key
             if key == pygame.K_w or key == pygame.K_UP:
                 GAME.move('w')
-            if key == pygame.K_a or key == pygame.K_LEFT:
+            elif key == pygame.K_a or key == pygame.K_LEFT:
                 GAME.move('a')
-            if key == pygame.K_s or key == pygame.K_DOWN:
+            elif key == pygame.K_s or key == pygame.K_DOWN:
                 GAME.move('s')
-            if key == pygame.K_d or key == pygame.K_RIGHT:
+            elif key == pygame.K_d or key == pygame.K_RIGHT:
                 GAME.move('d')
-            if event.key == pygame.K_RETURN:
+            elif event.key == pygame.K_RETURN:
                 pygame.quit()
                 sys.exit()
 
@@ -101,6 +125,7 @@ if __name__ == '__main__':
     # playing the game
     while GAME.is_playable():
         process_events()
+        current_song = play_song(current_song)
         SCREEN.fill('white')
         blit_all()
         pygame.display.update()
@@ -109,6 +134,7 @@ if __name__ == '__main__':
     # keeping the screen active after the game is over
     while True:
         process_events(only_quit=True)
+        current_song = play_song(current_song)
         blit_all()
         pygame.display.update()
         CLOCK.tick(60)
