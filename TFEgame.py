@@ -166,7 +166,7 @@ class TFEgame:
     
     def is_playable(self) -> bool:
         """ returns a boolean indicating whether the game is playable """
-        return self.can_move() or not self.won()
+        return self.can_move() and not self.won()
     
     def won(self) -> bool:
         """ returns a boolean indicating whether the game has been won, 10/2048 has been reached """
