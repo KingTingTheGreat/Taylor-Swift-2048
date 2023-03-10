@@ -21,6 +21,7 @@ if __name__ == '__main__':
 
     # set up clock
     CLOCK = pygame.time.Clock()
+    FPS = 60
 
     # set up game
     DIMS = (4, 4)
@@ -88,7 +89,7 @@ def blit_all() -> None:
 def blit_gameover() -> None:
     """ blits the gameover message """
     gameover = GAMEOVER_FONT.render('GAME OVER', True, 'red')
-    gameover_rect = gameover.get_rect(center=(WIDTH//2, 400))
+    gameover_rect = gameover.get_rect(center=(WIDTH//2, HEIGHT//2))
     SCREEN.blit(gameover, gameover_rect)
 
 
@@ -98,28 +99,39 @@ def blit_loss(current_song) -> None:
         process_events(only_quit=True)
         current_song = play_song(current_song)
         blit_all()
-        if counter < 15:
+        if counter < FPS//4:
             blit_gameover()
-        if counter >= 30:
+        if counter >= FPS//2:
             counter = 0
         counter += 1
         pygame.display.update()
-        CLOCK.tick(60)
+        CLOCK.tick(FPS)
+
+
+def blit_winner() -> None:
+    """ blits the winner message """
+    winner = GAMEOVER_FONT.render('YOU WIN!', True, 'green')
+    winner_rect = winner.get_rect(center=(WIDTH//2, HEIGHT//2))
+    SCREEN.blit(winner, winner_rect)
 
 
 def blit_won(current_song) -> None:
+    img_dim = TILE_DIM*DIMS[0]+TILE_SPACING*(DIMS[0]-1)
+    img = pygame.image.load('tiles\ME!.png').convert_alpha()
+    img = pygame.transform.scale(img, (img_dim, img_dim))
     counter = 0
     while True:
         process_events(only_quit=True)
         current_song = play_song(current_song)
         blit_all()
-        if counter < 15:
-            blit_gameover()
-        if counter >= 30:
+        if counter < FPS//4:
+            SCREEN.blit(img, (WIDTH//2-img_dim//2, HEIGHT//2-img_dim//2))
+            blit_winner()
+        if counter >= FPS//2:
             counter = 0
         counter += 1
         pygame.display.update()
-        CLOCK.tick(60)
+        CLOCK.tick(FPS)
 
 
 def play_song(current_song) -> str:
@@ -167,9 +179,8 @@ if __name__ == '__main__':
         current_song = play_song(current_song)
         blit_all()
         pygame.display.update()
-        CLOCK.tick(60)
+        CLOCK.tick(FPS)
 
-    print('game over')
     # keeping the screen active after the game is over
     if GAME.won():
         blit_won(current_song)
