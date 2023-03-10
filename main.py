@@ -1,6 +1,5 @@
 import pygame
 import sys
-import random
 from TFEgame import TFEgame
 
 if __name__ == '__main__':
@@ -41,7 +40,8 @@ if __name__ == '__main__':
         ALBUM_IMAGES[val] = pygame.transform.scale(img, (100, 100))
     TILE_DIM = 100
     TILE_SPACING = 10
-    TILES_RECTS = {(i, j): ALBUM_IMAGES[0].get_rect(center=((x_center + (TILE_DIM+TILE_SPACING)*(j-1.5), y_center + (TILE_DIM+TILE_SPACING)*(i-1.5)))) \
+    TILES_RECTS = {(i, j): ALBUM_IMAGES[0].get_rect(center=((x_center + (TILE_DIM+TILE_SPACING)*(j-1.5), \
+                                                             y_center + (TILE_DIM+TILE_SPACING)*(i-1.5)))) \
                     for j in range(DIMS[1]) for i in range(DIMS[0])}
 
     # set up outline of tiles
