@@ -17,6 +17,7 @@ if __name__ == '__main__':
 
     # set up fonts
     FONT = pygame.font.Font('fonts\Sequoia Regular.otf', 65)
+    GAMEOVER_FONT = pygame.font.Font('fonts\OpenSans-Bold.ttf', 65)
 
     # set up clock
     CLOCK = pygame.time.Clock()
@@ -83,6 +84,13 @@ def blit_all() -> None:
     blit_score()
 
 
+def blit_gameover() -> None:
+    """ blits the gameover message """
+    gameover = GAMEOVER_FONT.render('GAME OVER', True, 'black')
+    gameover_rect = gameover.get_rect(center=(WIDTH//2, 400))
+    SCREEN.blit(gameover, gameover_rect)
+
+
 def play_song(current_song) -> str:
     """ plays the song corresponding to the current max score """
     next_song = ALBUMS[GAME.max_tile()]
@@ -136,5 +144,6 @@ if __name__ == '__main__':
         process_events(only_quit=True)
         current_song = play_song(current_song)
         blit_all()
+        blit_gameover()
         pygame.display.update()
         CLOCK.tick(60)
