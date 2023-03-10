@@ -42,8 +42,11 @@ class TFEgame:
             empty_spaces = np.argwhere(self._board == 0)
             r, c = empty_spaces[random.randint(0, len(empty_spaces)-1)]
             self._board[r][c] = 2 if random.random() < 0.9 else 4
+        # the max tile will be 4 if it exists, otherwise it will be 2
         if 4 in self._board:
             self._max_tile = 4
+        else:
+            self._max_tile = 2
     
     def score(self) -> int:
         """ returns the game's score """
