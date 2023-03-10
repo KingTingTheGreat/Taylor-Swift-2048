@@ -159,8 +159,16 @@ class TFEgame:
         """ returns a boolean indicating whether the player can move """
         if not self._is_full():
             return True
-        for i, j in zip(range(1, self._dims[0]), range(1, self._dims[1])):
-            if self._board[i][j] == self._board[i][j-1] or self._board[i][j] == self._board[i-1][j]:
+        def check_adjacent(arr) -> bool:
+            """ returns boolean representing two same elements are next to each other """
+            for i in range(1, len(arr)):
+                if arr[i] == arr[i-1]:
+                    return True
+            return False
+        for i in range(self._dims[0]):  # dims must be square so we can check rows and cols together
+            row = self._board[i]
+            col = self._board[:,i]
+            if check_adjacent(row) or check_adjacent(col):
                 return True
         return False
     
