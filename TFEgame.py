@@ -12,10 +12,11 @@ class TFEgame:
         self._board = np.array([[0] * dims[0]] * dims[1])
         self._score = 0
         self._moves = 0
-        self._albums = {0:None, 2:'debut', 4:'fearless', 8:'speaknow', \
-                       16:'red', 32:'1989', 64:'reputation', 128:'lover', \
-                        256:'folklore', 512:'evermore', 1024:'midnights', \
+        self._albums = {0:None, 2:'TaylorSwift', 4:'Fearless', 8:'SpeakNow', \
+                       16:'Red', 32:'1989', 64:'Reputation', 128:'Lover', \
+                        256:'Folklore', 512:'Evermore', 1024:'Midnights', \
                         2048:'END'}
+        self._max_tile = 2
         self._gen_starting_tiles()
 
     
@@ -31,12 +32,18 @@ class TFEgame:
         """ returns a tuple of ints representing the dimensions of the board """
         return self._dims
     
+    def max_tile(self) -> int:
+        """ returns the largest tile on the board """
+        return self._max_tile
+    
     def _gen_starting_tiles(self) -> None:
         self._board = np.zeros_like(self._board)
         for i in range(2):
             empty_spaces = np.argwhere(self._board == 0)
             r, c = empty_spaces[random.randint(0, len(empty_spaces)-1)]
             self._board[r][c] = 2 if random.random() < 0.9 else 4
+        if 4 in self._board:
+            self._max_tile = 4
     
     def score(self) -> int:
         """ returns the game's score """
@@ -74,6 +81,8 @@ class TFEgame:
                     elem *= 2
                     row[i+1] = 0
                     self._score += elem
+                    if elem > self._max_tile:
+                        self._max_tile = elem
 
                 row[i] = 0
                 first_zero = np.where(row == 0)[0][0]
