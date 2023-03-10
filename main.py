@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     # set up fonts
     FONT = pygame.font.Font('fonts\Sequoia Regular.otf', 65)
-    GAMEOVER_FONT = pygame.font.Font('fonts\OpenSans-Bold.ttf', 65)
+    GAMEOVER_FONT = pygame.font.Font('fonts\OpenSans-ExtraBold.ttf', 80)
 
     # set up clock
     CLOCK = pygame.time.Clock()
@@ -78,6 +78,7 @@ def blit_tiles(board) -> None:
 
 def blit_all() -> None:
     """ blits all the elements of the game """
+    SCREEN.fill('white')
     SCREEN.blit(OUTLINE, OUTLINE_RECT)
     blit_tiles(GAME.board())
     blit_title()
@@ -86,9 +87,39 @@ def blit_all() -> None:
 
 def blit_gameover() -> None:
     """ blits the gameover message """
-    gameover = GAMEOVER_FONT.render('GAME OVER', True, 'black')
+    gameover = GAMEOVER_FONT.render('GAME OVER', True, 'red')
     gameover_rect = gameover.get_rect(center=(WIDTH//2, 400))
     SCREEN.blit(gameover, gameover_rect)
+
+
+def blit_loss(current_song) -> None:
+    counter = 0
+    while True:
+        process_events(only_quit=True)
+        current_song = play_song(current_song)
+        blit_all()
+        if counter < 15:
+            blit_gameover()
+        if counter >= 30:
+            counter = 0
+        counter += 1
+        pygame.display.update()
+        CLOCK.tick(60)
+
+
+def blit_won(current_song) -> None:
+    counter = 0
+    while True:
+        process_events(only_quit=True)
+        current_song = play_song(current_song)
+        blit_all()
+        if counter < 15:
+            blit_gameover()
+        if counter >= 30:
+            counter = 0
+        counter += 1
+        pygame.display.update()
+        CLOCK.tick(60)
 
 
 def play_song(current_song) -> str:
@@ -134,16 +165,13 @@ if __name__ == '__main__':
     while GAME.is_playable():
         process_events()
         current_song = play_song(current_song)
-        SCREEN.fill('white')
         blit_all()
         pygame.display.update()
         CLOCK.tick(60)
 
+    print('game over')
     # keeping the screen active after the game is over
-    while True:
-        process_events(only_quit=True)
-        current_song = play_song(current_song)
-        blit_all()
-        blit_gameover()
-        pygame.display.update()
-        CLOCK.tick(60)
+    if GAME.won():
+        blit_won(current_song)
+    else:
+        blit_loss(current_song)
