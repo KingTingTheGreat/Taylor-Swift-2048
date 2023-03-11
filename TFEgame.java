@@ -221,9 +221,8 @@ public class TFEgame {
         // combine like terms and shift accordingly
         for (int i = 0; i < collapsed.length; i++) {
             int elem = collapsed[i];
-            if (elem == 0) {
+            if (elem == 0)
                 continue;
-            }
             if (i != collapsed.length-1 && elem == collapsed[i+1]) {
                 elem *= 2;
                 collapsed[i + 1] = 0;
@@ -233,7 +232,6 @@ public class TFEgame {
             collapsed[i] = 0;
             index = indexOf(collapsed, 0);
             collapsed[index] = elem;
-
         }
         return collapsed;
     }   
@@ -243,9 +241,8 @@ public class TFEgame {
         for (int i = 0; i < dims[0]; i++) {
             int[] row = getRow(board, i);
             int[] collapsed = collapse(row);
-            if (!Arrays.equals(row, collapsed)) {
+            if (!Arrays.equals(row, collapsed))
                 changed = true;
-            }
             setRow(board, collapsed, i);
         }
         return changed;
@@ -257,9 +254,8 @@ public class TFEgame {
             int[] row = getRow(board, i);
             int[] reversed = reverse(row);
             int[] collapsed = collapse(reversed);
-            if (!Arrays.equals(row, collapsed)) {
+            if (!Arrays.equals(row, collapsed))
                 changed = true;
-            }
             setRow(board, reverse(collapsed), i);
         }
         return changed;
@@ -270,9 +266,8 @@ public class TFEgame {
         for (int i = 0; i < dims[1]; i++) {
             int[] col = getCol(board, i);
             int[] collapsed = collapse(col);
-            if (!Arrays.equals(col, collapsed)) {
+            if (!Arrays.equals(col, collapsed))
                 changed = true;
-            }
             setCol(board, collapsed, i);
         }
         return changed;
@@ -284,9 +279,8 @@ public class TFEgame {
             int[] col = getCol(board, i);
             int[] reversed = reverse(col);
             int[] collapsed = collapse(reversed);
-            if (!Arrays.equals(col, collapsed)) {
+            if (!Arrays.equals(col, collapsed))
                 changed = true;
-            }
             setCol(board, reverse(collapsed), i);
         }
         return changed;
@@ -354,9 +348,8 @@ public class TFEgame {
     private boolean isFull() {
         for (int i = 0; i < dims[0]; i++) {
             for (int j = 0; j < dims[1]; j++) {
-                if (board[i][j] == 0) {
+                if (board[i][j] == 0)
                     return false;
-                }
             }
         }
         return true;
@@ -367,9 +360,8 @@ public class TFEgame {
      */
     private boolean checkAdjacent(int[] arr) {
         for (int i = 0; i < arr.length-1; i++) {
-            if (arr[i] == arr[i+1]) {
+            if (arr[i] == arr[i+1])
                 return true;
-            }
         }
         return false;
     }
@@ -379,23 +371,20 @@ public class TFEgame {
      */
     public boolean canMove() {
         // check if there are any empty spaces
-        if (!isFull()) {
+        if (!isFull())
             return true;
-        }
         // check if there are any adjacent tiles that are equal
         // check rows
         for (int i = 0; i < dims[0]; i++) {
             int[] row = getRow(board, i);
-            if (checkAdjacent(row)) {
+            if (checkAdjacent(row))
                 return true;
-            }
         }
         // check columns
         for (int i = 0; i < dims[1]; i++) {
             int[] col = getCol(board, i);
-            if (checkAdjacent(col)) {
+            if (checkAdjacent(col))
                 return true;
-            }
         }
         return false;
     }
@@ -406,9 +395,8 @@ public class TFEgame {
     public boolean isWon() {
         for (int i = 0; i < dims[0]; i++) {
             for (int j = 0; j < dims[1]; j++) {
-                if (board[i][j] == 2048) {
+                if (board[i][j] == 2048)
                     return true;
-                }
             }
         }
         return false;
