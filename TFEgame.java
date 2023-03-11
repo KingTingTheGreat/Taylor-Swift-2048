@@ -2,13 +2,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Arrays;
+// import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 
 public class TFEgame {
 
     private int[] dims;
-    private int[][] board;
+    private ArrayList<ArrayList<Integer>> board;
     private int score;
     private int moves;
     private HashMap<Integer, String> albums;
@@ -23,7 +24,14 @@ public class TFEgame {
             throw new IllegalArgumentException("Dimensions must be square");
         }
         this.dims = dims;
-        this.board = new int[dims[0]][dims[1]];
+        this.board = new ArrayList<ArrayList<Integer>>();
+        for (int i = 0; i < dims[0]; i++) {
+            ArrayList<Integer> row = new ArrayList<Integer>();
+            for (int j = 0; j < dims[1]; j++) {
+                row.add(0);
+            }
+            board.add(row);
+        }
         this.score = 0;
         this.moves = 0;
 
@@ -61,15 +69,26 @@ public class TFEgame {
         String s = "";
         for (int i = 0; i < dims[0]; i++) {
             for (int j = 0; j < dims[1]; j++) {
-                s += board[i][j] + " ";
+                s += board.get(i).get(j) + " ";
             }
             s += "\n";
         }
         return s;
     }
 
-    public int[][] getBoard() {
-        return board.clone();
+    /*
+     * returns a deepcopy of the board
+     */
+    public ArrayList<ArrayList<Integer>> getBoard() {     
+        ArrayList<ArrayList<Integer>> newBoard = new ArrayList<ArrayList<Integer>>();
+        for (int i = 0; i < dims[0]; i++) {
+            ArrayList<Integer> row = new ArrayList<Integer>();
+            for (int j = 0; j < dims[1]; j++) {
+                row.add(board.get(i).get(j));
+            }
+            newBoard.add(row);
+        }
+        return newBoard;
     }
 
     public int[] getDims() {
@@ -92,10 +111,13 @@ public class TFEgame {
      * sets all tiles to 0
      */
     private void setZeros() {
+        board = new ArrayList<ArrayList<Integer>>();
         for (int i = 0; i < dims[0]; i++) {
+            ArrayList<Integer> row = new ArrayList<Integer>();
             for (int j = 0; j < dims[1]; j++) {
-                board[i][j] = 0;
+                row.add(0);
             }
+            board.add(row);
         }
     } 
 
@@ -108,15 +130,15 @@ public class TFEgame {
         // first tile
         int x = randomGenerator.nextInt(dims[0]);
         int y = randomGenerator.nextInt(dims[1]);
-        board[x][y] = randomGenerator.nextInt(10) < 9 ? 2 : 4;
+        board.get(x).set(y, randomGenerator.nextInt(10) < 9 ? 2 : 4);
         // second tile
         x = randomGenerator.nextInt(dims[0]);
         y = randomGenerator.nextInt(dims[1]);
-        while (board[x][y] != 0) {
+        while (board.get(x).get(y) != 0) {
             x = randomGenerator.nextInt(dims[0]);
             y = randomGenerator.nextInt(dims[1]);
         }
-        board[x][y] = randomGenerator.nextInt(10) < 9 ? 2 : 4;
+        board.get(x).set(y, randomGenerator.nextInt(10) < 9 ? 2 : 4);
     }
 
     /*
@@ -134,46 +156,39 @@ public class TFEgame {
         }
         return key;
     }
-    
-    /*
-     * returns the first index of target in arr
-     */
-    private int indexOf(int[] arr, int target) {
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] == target)
-                return i;
-        }
-        return -1;
-    }
 
     /*
      * returns the row at the given index
      */
-    private int[] getRow(int[][] board, int row) {
-        if (row >= board.length)
+    private ArrayList<Integer> getRow(ArrayList<ArrayList<Integer>> board, int index) {
+        if (index >= board.size())
             throw new IllegalArgumentException("Row index out of bounds");
-        return board[row];
+        ArrayList<Integer> row = new ArrayList<Integer>();
+        for (int i = 0; i < board.size(); i++) {
+            row.add(board.get(index).get(i));
+        }
+        return row;
     }
 
     /*
      * sets the row at the given index to the given array
      */
-    private boolean setRow(int[][] board, int[] row, int index) {
-        if (row.length != board.length)
+    private boolean setRow(ArrayList<ArrayList<Integer>> board, ArrayList<Integer> row, int index) {
+        if (row.size() != board.size())
             return false;
-        board[index] = row;
+        board.set(index, row);
         return true;
     }
 
     /*
      * returns the column at the given index
      */
-    private int[] getCol(int[][] board, int col) {
-        if (col >= board.length)
+    private ArrayList<Integer> getCol(ArrayList<ArrayList<Integer>> board, int index) {
+        if (index >= board.get(0).size())
             throw new IllegalArgumentException("Column index out of bounds");
-        int[] column = new int[board.length];
-        for (int i = 0; i < board.length; i++) {
-            column[i] = board[i][col];
+        ArrayList<Integer> column = new ArrayList<Integer>();
+        for (int i = 0; i < board.get(0).size(); i++) {
+            column.add(board.get(i).get(index));
         }
         return column;
     }
@@ -181,11 +196,11 @@ public class TFEgame {
     /*
      * sets the column at the given index to the given array
      */
-    private boolean setCol(int[][] board, int[] col, int index) {
-        if (col.length != board.length)
+    private boolean setCol(ArrayList<ArrayList<Integer>> board, ArrayList<Integer> col, int index) {
+        if (col.size() != board.get(0).size())
             return false;
-        for (int i = 0; i < board.length; i++) {
-            board[i][index] = col[i];
+        for (int i = 0; i < board.get(0).size(); i++) {
+            board.get(i).set(index, col.get(i));
         }
         return true;
     }
@@ -193,31 +208,36 @@ public class TFEgame {
     /*
      * collapses the given row by combining like nonzero terms and shifting them to the left
      */
-    private int[] collapse(int[] row) {
+    private ArrayList<Integer> collapse(ArrayList<Integer> row) {
         // the output array
-        int[] collapsed = new int[row.length];
+        ArrayList<Integer> collapsed = new ArrayList<Integer>();
         // move all nonzero elements to the left
         int index = 0;
-        for (int i = 0; i < row.length; i++) {
-            if (row[i] != 0) {
-                collapsed[index] = row[i];
+        for (int i = 0; i < row.size(); i++) {
+            if (row.get(i) != 0) {
+                collapsed.add(row.get(i));
                 index++;
             }
         }
+        // pad the rest of the array with 0s
+        for (int i = index; i < row.size(); i++) {
+            collapsed.add(0);
+        }
         // combine like terms and shift accordingly
-        for (int i = 0; i < collapsed.length; i++) {
-            int elem = collapsed[i];
+        for (int i = 0; i < collapsed.size(); i++) {
+            int elem = collapsed.get(i);
             if (elem == 0)
                 continue;
-            if (i != collapsed.length-1 && elem == collapsed[i+1]) {
+            if (i != collapsed.size()-1 && elem == collapsed.get(i+1)) {
                 elem *= 2;
-                collapsed[i + 1] = 0;
+                collapsed.set(i+1, 0);
                 score += elem;
                 maxTile = Math.max(maxTile, elem);
             }
-            collapsed[i] = 0;
-            index = indexOf(collapsed, 0);
-            collapsed[index] = elem;
+            collapsed.set(i, 0);
+            index = collapsed.indexOf(0);
+            // index = indexOf(collapsed, 0);
+            collapsed.set(index, elem);
         }
         return collapsed;
     }   
@@ -225,9 +245,9 @@ public class TFEgame {
     private boolean left() {
         boolean changed = false;
         for (int i = 0; i < dims[0]; i++) {
-            int[] row = getRow(board, i);
-            int[] collapsed = collapse(row);
-            if (!Arrays.equals(row, collapsed))
+            ArrayList<Integer> row = getRow(board, i);
+            ArrayList<Integer> collapsed = collapse(row);
+            if (!row.equals(collapsed))
                 changed = true;
             setRow(board, collapsed, i);
         }
@@ -237,13 +257,12 @@ public class TFEgame {
     private boolean right() {
         boolean changed = false;
         for (int i = 0; i < dims[0]; i++) {
-            int[] row = getRow(board, i);
-            int[] reversed = row.clone();
-            Collections.reverse(Arrays.asList(reversed));
-            int[] collapsed = collapse(reversed);
-            Collections.reverse(Arrays.asList(collapsed));
-            if (!Arrays.equals(row, collapsed))
+            ArrayList<Integer> row = getRow(board, i);
+            Collections.reverse(row);
+            ArrayList<Integer> collapsed = collapse(row);
+            if (!row.equals(collapsed))
                 changed = true;
+            Collections.reverse(collapsed);
             setRow(board, collapsed, i);
         }
         return changed;
@@ -252,9 +271,9 @@ public class TFEgame {
     private boolean up() {
         boolean changed = false;
         for (int i = 0; i < dims[1]; i++) {
-            int[] col = getCol(board, i);
-            int[] collapsed = collapse(col);
-            if (!Arrays.equals(col, collapsed))
+            ArrayList<Integer> col = getCol(board, i);
+            ArrayList<Integer> collapsed = collapse(col);
+            if (!col.equals(collapsed))
                 changed = true;
             setCol(board, collapsed, i);
         }
@@ -264,13 +283,12 @@ public class TFEgame {
     private boolean down() {
         boolean changed = false;
         for (int i = 0; i < dims[1]; i++) {
-            int[] col = getCol(board, i);
-            int[] reversed = col.clone();
-            Collections.reverse(Arrays.asList(reversed));
-            int[] collapsed = collapse(reversed);
-            Collections.reverse(Arrays.asList(collapsed));
-            if (!Arrays.equals(col, collapsed))
+            ArrayList<Integer> col = getCol(board, i);
+            Collections.reverse(col);
+            ArrayList<Integer> collapsed = collapse(col);
+            if (!col.equals(collapsed))
                 changed = true;
+            Collections.reverse(collapsed);
             setCol(board, collapsed, i);
         }
         return changed;
@@ -325,11 +343,11 @@ public class TFEgame {
     private void addRandomTile() {
         int x = randomGenerator.nextInt(dims[0]);
         int y = randomGenerator.nextInt(dims[1]);
-        while (board[x][y] != 0) {
+        while (board.get(x).get(y) != 0) {
             x = randomGenerator.nextInt(dims[0]);
             y = randomGenerator.nextInt(dims[1]);
         }
-        board[x][y] = randomGenerator.nextInt(10) < 9 ? 2 : 4;
+        board.get(x).set(y, randomGenerator.nextInt(10) < 9 ? 2 : 4);
     }
 
     /*
@@ -338,7 +356,7 @@ public class TFEgame {
     private boolean isFull() {
         for (int i = 0; i < dims[0]; i++) {
             for (int j = 0; j < dims[1]; j++) {
-                if (board[i][j] == 0)
+                if (board.get(i).get(j) == 0)
                     return false;
             }
         }
@@ -348,9 +366,9 @@ public class TFEgame {
     /*
      * returns true if there are any adjacent tiles that are equal
      */
-    private boolean checkAdjacent(int[] arr) {
-        for (int i = 0; i < arr.length-1; i++) {
-            if (arr[i] == arr[i+1])
+    private boolean checkAdjacent(ArrayList<Integer> arr) {
+        for (int i = 0; i < arr.size()-1; i++) {
+            if (arr.get(i) == arr.get(i+1))
                 return true;
         }
         return false;
@@ -366,13 +384,13 @@ public class TFEgame {
         // check if there are any adjacent tiles that are equal
         // check rows
         for (int i = 0; i < dims[0]; i++) {
-            int[] row = getRow(board, i);
+            ArrayList<Integer> row = getRow(board, i);
             if (checkAdjacent(row))
                 return true;
         }
         // check columns
         for (int i = 0; i < dims[1]; i++) {
-            int[] col = getCol(board, i);
+            ArrayList<Integer> col = getCol(board, i);
             if (checkAdjacent(col))
                 return true;
         }
@@ -385,7 +403,7 @@ public class TFEgame {
     public boolean isWon() {
         for (int i = 0; i < dims[0]; i++) {
             for (int j = 0; j < dims[1]; j++) {
-                if (board[i][j] == 2048)
+                if (board.get(i).get(j) == 2048)
                     return true;
             }
         }
@@ -425,5 +443,10 @@ public class TFEgame {
             System.out.println("You lost!");
             return false;
         }
+    }
+
+    public static void main(String[] args) {
+        TFEgame game = new TFEgame();
+        game.play();
     }
 }
