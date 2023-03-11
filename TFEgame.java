@@ -46,6 +46,9 @@ public class TFEgame {
         genStartingTiles();
     }
 
+    /*
+     * method overloading such that no input dims are required
+     */
     public TFEgame() {
         this(new int[] {4, 4});
     }
@@ -117,6 +120,9 @@ public class TFEgame {
         board[x][y] = randomGenerator.nextInt(10) < 9 ? 2 : 4;
     }
 
+    /*
+     * gets an input key from the user and returns it if it's valid
+     */
     private char getKeyInput() {
         HashSet<Character> keys = new HashSet<Character>();
         keys.add('w');
@@ -141,6 +147,9 @@ public class TFEgame {
         return -1;
     }
 
+    /*
+     * returns a reversed version of the given array
+     */
     private int[] reverse(int[] arr) {
         int[] reversed = new int[arr.length];
         int index = 0;
@@ -281,6 +290,9 @@ public class TFEgame {
         return changed;
     }
 
+    /*
+     * calls the appropriate method based on the given key
+     */
     private boolean doMove(char key) {
         switch (key) {
             case 'w':
@@ -348,6 +360,9 @@ public class TFEgame {
         return true;
     }
 
+    /*
+     * returns true if there are any adjacent tiles that are equal
+     */
     private boolean checkAdjacent(int[] arr) {
         for (int i = 0; i < arr.length-1; i++) {
             if (arr[i] == arr[i+1]) {
@@ -431,10 +446,4 @@ public class TFEgame {
             return false;
         }
     }
-
-    public static void main(String[] args) {
-        TFEgame game = new TFEgame();
-        game.play();
-    }
-
 }
