@@ -3,6 +3,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class TFEgame {
 
@@ -104,12 +105,10 @@ public class TFEgame {
      */
     private void genStartingTiles() {
         setZeros();
-
         // first tile
         int x = randomGenerator.nextInt(dims[0]);
         int y = randomGenerator.nextInt(dims[1]);
         board[x][y] = randomGenerator.nextInt(10) < 9 ? 2 : 4;
-
         // second tile
         x = randomGenerator.nextInt(dims[0]);
         y = randomGenerator.nextInt(dims[1]);
@@ -145,19 +144,6 @@ public class TFEgame {
                 return i;
         }
         return -1;
-    }
-
-    /*
-     * returns a reversed version of the given array
-     */
-    private int[] reverse(int[] arr) {
-        int[] reversed = new int[arr.length];
-        int index = 0;
-        for (int i = arr.length-1; i >= 0; i --) {
-            reversed[index] = arr[i];
-            index++;
-        }
-        return reversed;
     }
 
     /*
@@ -252,11 +238,13 @@ public class TFEgame {
         boolean changed = false;
         for (int i = 0; i < dims[0]; i++) {
             int[] row = getRow(board, i);
-            int[] reversed = reverse(row);
+            int[] reversed = row.clone();
+            Collections.reverse(Arrays.asList(reversed));
             int[] collapsed = collapse(reversed);
+            Collections.reverse(Arrays.asList(collapsed));
             if (!Arrays.equals(row, collapsed))
                 changed = true;
-            setRow(board, reverse(collapsed), i);
+            setRow(board, collapsed, i);
         }
         return changed;
     }
@@ -277,11 +265,13 @@ public class TFEgame {
         boolean changed = false;
         for (int i = 0; i < dims[1]; i++) {
             int[] col = getCol(board, i);
-            int[] reversed = reverse(col);
+            int[] reversed = col.clone();
+            Collections.reverse(Arrays.asList(reversed));
             int[] collapsed = collapse(reversed);
+            Collections.reverse(Arrays.asList(collapsed));
             if (!Arrays.equals(col, collapsed))
                 changed = true;
-            setCol(board, reverse(collapsed), i);
+            setCol(board, collapsed, i);
         }
         return changed;
     }
