@@ -164,6 +164,8 @@ public class TFEgame {
      * returns the row at the given index
      */
     private int[] getRow(int[][] board, int row) {
+        if (row >= board.length)
+            throw new IllegalArgumentException("Row index out of bounds");
         return board[row];
     }
 
@@ -171,9 +173,8 @@ public class TFEgame {
      * sets the row at the given index to the given array
      */
     private boolean setRow(int[][] board, int[] row, int index) {
-        if (row.length != board.length) {
+        if (row.length != board.length)
             return false;
-        }
         board[index] = row;
         return true;
     }
@@ -182,6 +183,8 @@ public class TFEgame {
      * returns the column at the given index
      */
     private int[] getCol(int[][] board, int col) {
+        if (col >= board.length)
+            throw new IllegalArgumentException("Column index out of bounds");
         int[] column = new int[board.length];
         for (int i = 0; i < board.length; i++) {
             column[i] = board[i][col];
@@ -193,9 +196,8 @@ public class TFEgame {
      * sets the column at the given index to the given array
      */
     private boolean setCol(int[][] board, int[] col, int index) {
-        if (col.length != board.length) {
+        if (col.length != board.length)
             return false;
-        }
         for (int i = 0; i < board.length; i++) {
             board[i][index] = col[i];
         }
