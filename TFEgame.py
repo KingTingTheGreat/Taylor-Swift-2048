@@ -64,7 +64,7 @@ class TFEgame:
     def _do_move(self, m) -> bool:
         """ calls the appropriate method to execute a given move input """                
         def collapse(row:np.array) -> np.array:
-            # move all elements to the left 
+            # move all nonzero elements to the left 
             # ('left' is relative to the direction of the move and is accounted for by the caller)
             nonzeros = list(np.nonzero(row)[0])
             for i in range(len(row)):
@@ -75,7 +75,7 @@ class TFEgame:
                 if i != index:
                     row[index] = 0
 
-            # combine like terms
+            # combine like terms and shift accordingly
             for i in range(len(row)):
                 elem = row[i]
                 if elem == 0:
@@ -84,8 +84,7 @@ class TFEgame:
                     elem *= 2
                     row[i+1] = 0
                     self._score += elem
-                    if elem > self._max_tile:
-                        self._max_tile = elem
+                    self._max_tile = max(elem, self._max_tile)
 
                 row[i] = 0
                 first_zero = np.where(row == 0)[0][0]
