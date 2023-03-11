@@ -98,7 +98,7 @@ class TFEgame:
             changed = False
             for i, row in enumerate(self._board):
                 orig = row.copy()
-                self._board[i] = collapse(row)
+                self._board[i] = collapse(orig)
                 if not np.array_equal(orig, self._board[i]):
                     changed = True
             return changed
@@ -107,7 +107,7 @@ class TFEgame:
             changed = False
             for i, row in enumerate(self._board):
                 orig = row.copy()
-                self._board[i] = np.flip(collapse(np.flip(row)))
+                self._board[i] = np.flip(collapse(np.flip(orig)))
                 if not np.array_equal(orig, self._board[i]):
                     changed = True
             return changed
@@ -116,7 +116,7 @@ class TFEgame:
             changed = False
             for i in range(len(self._board)):
                 orig = self._board[:,i].copy()
-                self._board[:,i] = collapse(self._board[:,i])
+                self._board[:,i] = collapse(orig)
                 if not np.array_equal(orig, self._board[:,i]):
                     changed = True
             return changed
@@ -125,7 +125,7 @@ class TFEgame:
             changed = False
             for i in range(len(self._board)):
                 orig = self._board[:,i].copy()
-                self._board[:,i] = np.flip(collapse(np.flip(self._board[:,i])))
+                self._board[:,i] = np.flip(collapse(np.flip(orig)))
                 if not np.array_equal(orig, self._board[:,i]):
                     changed = True
             return changed
