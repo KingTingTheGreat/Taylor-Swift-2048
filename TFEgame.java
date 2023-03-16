@@ -236,7 +236,6 @@ public class TFEgame {
             }
             collapsed.set(i, 0);
             index = collapsed.indexOf(0);
-            // index = indexOf(collapsed, 0);
             collapsed.set(index, elem);
         }
         return collapsed;
