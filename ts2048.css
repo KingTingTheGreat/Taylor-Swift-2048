@@ -1,0 +1,35 @@
+/* title */
+ttl {
+    color: black;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 50px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 2px 2px 4px #000000;
+}
+score {
+    color: black;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 2px 2px 4px #000000;
+}
+/* game board */
+#game-container {
+    background-color: #ff7fff;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    margin: 0 auto;
+    padding: 10px;
+    width: auto;
+    height: auto
+}
+/* image tiles */
+img.tile {
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    margin: 10px auto;
+    width: 100px;
+}
