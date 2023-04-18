@@ -59,6 +59,7 @@ class TFEgame:
             if key in keys:
                 return key
             if key == 'q':
+                print('quiting game...')
                 sys.exit()
             
     def _do_move(self, m) -> bool:
