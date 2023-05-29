@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 import numpy as np
 from TFEgame import TFEgame
 from pyvidplayer import Video
@@ -47,18 +48,24 @@ if __name__ == '__main__':
                     for j in range(DIMS[1]) for i in range(DIMS[0])}
 
     # set up outline of tiles
+    COLORS:dict[int, str] = {0: 'black', 2: 'lightgreen', 4: 'gold', 8: 'violet', \
+                            16: 'red', 32: 'mediumblue', 64: 'darkgrey', 128: 'pink', \
+                            256: 'lightgrey', 512: 'brown', 1024: 'darkblue', 2048: 'random'}
+    current_color:str = COLORS[GAME.max_tile()]
+
     OUTLINE_DIM:int = TILE_DIM*DIMS[0]+TILE_SPACING*(DIMS[0]-1)+2*TILE_SPACING
     OUTLINE:pygame.Surface = pygame.Surface((OUTLINE_DIM, OUTLINE_DIM))
-    OUTLINE.fill('black')
+    OUTLINE.fill(current_color)
     OUTLINE_RECT:pygame.Rect = OUTLINE.get_rect(center=(WIDTH//2, HEIGHT//2))
     OUTLINE_VERT = pygame.Surface((TILE_SPACING, OUTLINE_DIM))
-    OUTLINE_VERT.fill('black')
+    OUTLINE_VERT.fill(current_color)
     OUTLINE_HORIZ = pygame.Surface((OUTLINE_DIM, TILE_SPACING))
-    OUTLINE_HORIZ.fill('black')
+    OUTLINE_HORIZ.fill(current_color)
 
 
     # set up music video
     current_video:Video = Video(f'music-videos/{ALBUMS[GAME.max_tile()]}.mp4')
+    current_video.set_volume(0.3)
     VIDEO_COORDS:tuple[int] = (0, HEIGHT//4)
 
 
@@ -79,8 +86,6 @@ def blit_score() -> None:
 def blit_tiles(board) -> None:
     """ blits the tiles of the board """
     for coord in TILES_RECTS:
-        # print(ALBUM_IMAGES)
-        # print(TILES_RECTS)
         SCREEN.blit(ALBUM_IMAGES[board[coord]], TILES_RECTS[coord])
 
 
@@ -97,7 +102,6 @@ def blit_all(current_video=None) -> None:
     SCREEN.fill('white')
     if current_video:
         current_video.draw(SCREEN, VIDEO_COORDS, force_draw=True)
-    # SCREEN.blit(OUTLINE, OUTLINE_RECT)
     blit_outline()
     blit_tiles(GAME.board())
     blit_title()
@@ -111,11 +115,10 @@ def blit_gameover() -> None:
     SCREEN.blit(gameover, gameover_rect)
 
 
-def blit_loss(current_song) -> None:
+def blit_loss() -> None:
     counter = 0
     while True:
         process_events(only_quit=True)
-        current_song = play_song(current_song)
         blit_all()
         if counter < FPS//4:
             blit_gameover()
@@ -133,14 +136,13 @@ def blit_winner() -> None:
     SCREEN.blit(winner, winner_rect)
 
 
-def blit_won(current_song) -> None:
+def blit_won() -> None:
     img_dim = TILE_DIM*DIMS[0]+TILE_SPACING*(DIMS[0]-1)
     img = pygame.image.load('tiles\ME!.png').convert_alpha()
     img = pygame.transform.scale(img, (img_dim, img_dim))
     counter = 0
     while True:
         process_events(only_quit=True)
-        current_song = play_song(current_song)
         blit_all()
         if counter < FPS//4:
             SCREEN.blit(img, (WIDTH//2-img_dim//2, HEIGHT//2-img_dim//2))
@@ -159,6 +161,10 @@ def play_song(current_song) -> any:
         return None
     if next_song == 'END':
         next_song = 'ME!'
+    current_color:str = COLORS[GAME.max_tile()]
+    OUTLINE.fill(current_color)
+    OUTLINE_VERT.fill(current_color)
+    OUTLINE_HORIZ.fill(current_color)
     return Video(f'music-videos/{next_song}.mp4')
 
 
@@ -194,12 +200,13 @@ if __name__ == '__main__':
         next_song = play_song(current_video)
         if next_song:
             current_video = next_song
+            current_video.set_volume(0.2)
         blit_all(current_video)
         pygame.display.update()
         CLOCK.tick(FPS)
 
-    # # keeping the screen active after the game is over
-    # if GAME.won():
-    #     blit_won(current_song)
-    # else:
-    #     blit_loss(current_song)
+    # keeping the screen active after the game is over
+    if GAME.won():
+        blit_won()
+    else:
+        blit_loss()
