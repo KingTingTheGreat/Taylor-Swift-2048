@@ -1,60 +1,72 @@
 import pygame
 import sys
+import random
+import numpy as np
 from TFEgame import TFEgame
+from pyvidplayer import Video
 
 if __name__ == '__main__':
     pygame.init()
 
     # set up the visible screen
     pygame.display.set_caption('Taylor Swift 2048')
-    WIDTH = 600
-    x_center = WIDTH//2
-    HEIGHT = 800
-    y_center = HEIGHT//2
-    SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+    WIDTH:int = 600
+    x_center:int = WIDTH//2
+    HEIGHT:int = 800
+    y_center:int = HEIGHT//2
+    SCREEN:pygame.Surface = pygame.display.set_mode((WIDTH, HEIGHT))
     SCREEN.fill('white')
 
     # set up fonts
-    FONT = pygame.font.Font('fonts\Sequoia Regular.otf', 65)
-    GAMEOVER_FONT = pygame.font.Font('fonts\OpenSans-ExtraBold.ttf', 80)
+    FONT:pygame.font.Font = pygame.font.Font('fonts\Sequoia Regular.otf', 65)
+    GAMEOVER_FONT:pygame.font.Font = pygame.font.Font('fonts\OpenSans-ExtraBold.ttf', 80)
 
     # set up clock
-    CLOCK = pygame.time.Clock()
-    FPS = 60
+    CLOCK:pygame.time.Clock = pygame.time.Clock()
+    FPS:int = 60
 
     # set up game
-    DIMS = (4, 4)
-    GAME = TFEgame(DIMS)
-    BOARD = GAME.board()
+    DIMS:tuple[int] = (4, 4)
+    GAME:TFEgame = TFEgame(DIMS)
+    BOARD:np.array = GAME.board()
 
     # set up tile images and corresponding rects
-    ALBUMS = {0: '_', 2: 'TaylorSwift', 4: 'Fearless', 8: 'SpeakNow', \
+    ALBUMS:dict[int, str] = {0: '_', 2: 'TaylorSwift', 4: 'Fearless', 8: 'SpeakNow', \
             16: 'Red', 32: '1989', 64: 'Reputation', 128: 'Lover', \
             256: 'folklore', 512: 'evermore', 1024: 'Midnights', 2048: 'END'}
-    ALBUM_IMAGES = {}
-    for val in ALBUMS:
-        album = ALBUMS[val]
+    ALBUM_IMAGES:dict[int, pygame.Surface] = {}
+    for key in ALBUMS:
+        album = ALBUMS[key]
         if album == 'END':
             album = 'ME!'
         img = pygame.image.load(f'tiles\{album}.png').convert_alpha()
-        ALBUM_IMAGES[val] = pygame.transform.scale(img, (100, 100))
-    TILE_DIM = 100
-    TILE_SPACING = 10
-    TILES_RECTS = {(i, j): ALBUM_IMAGES[0].get_rect(center=((x_center + (TILE_DIM+TILE_SPACING)*(j-1.5), \
+        ALBUM_IMAGES[key] = pygame.transform.scale(img, (100, 100))
+    TILE_DIM:int = 100
+    TILE_SPACING:int = 10
+    TILES_RECTS:dict[tuple[int, int], any] = {(i, j): ALBUM_IMAGES[0].get_rect(center=((x_center + (TILE_DIM+TILE_SPACING)*(j-1.5), \
                                                              y_center + (TILE_DIM+TILE_SPACING)*(i-1.5)))) \
                     for j in range(DIMS[1]) for i in range(DIMS[0])}
 
     # set up outline of tiles
-    OUTLINE_DIM = TILE_DIM*DIMS[0]+TILE_SPACING*(DIMS[0]-1)+2*TILE_SPACING
-    OUTLINE = pygame.Surface((OUTLINE_DIM, OUTLINE_DIM))
-    OUTLINE.fill('black')
-    OUTLINE_RECT = OUTLINE.get_rect(center=(WIDTH//2, HEIGHT//2))
+    COLORS:dict[int, str] = {0: 'black', 2: 'lightgreen', 4: 'gold', 8: 'violet', \
+                            16: 'red', 32: 'mediumblue', 64: 'darkgrey', 128: 'pink', \
+                            256: 'lightgrey', 512: 'brown', 1024: 'darkblue', 2048: 'random'}
+    current_color:str = COLORS[GAME.max_tile()]
 
-    # set up song
-    current_song = ALBUMS[GAME.max_tile()]  # song will either be from TaylorSwift or from Fearless
-    pygame.mixer.music.set_volume(0.8)
-    pygame.mixer.music.load(f'songs\{current_song}.mp3')
-    pygame.mixer.music.play()
+    OUTLINE_DIM:int = TILE_DIM*DIMS[0]+TILE_SPACING*(DIMS[0]-1)+2*TILE_SPACING
+    OUTLINE:pygame.Surface = pygame.Surface((OUTLINE_DIM, OUTLINE_DIM))
+    OUTLINE.fill(current_color)
+    OUTLINE_RECT:pygame.Rect = OUTLINE.get_rect(center=(WIDTH//2, HEIGHT//2))
+    OUTLINE_VERT = pygame.Surface((TILE_SPACING, OUTLINE_DIM))
+    OUTLINE_VERT.fill(current_color)
+    OUTLINE_HORIZ = pygame.Surface((OUTLINE_DIM, TILE_SPACING))
+    OUTLINE_HORIZ.fill(current_color)
+
+
+    # set up music video
+    current_video:Video = Video(f'music-videos/{ALBUMS[GAME.max_tile()]}.mp4')
+    current_video.set_volume(0.3)
+    VIDEO_COORDS:tuple[int] = (0, HEIGHT//4)
 
 
 def blit_title() -> None:
@@ -77,10 +89,20 @@ def blit_tiles(board) -> None:
         SCREEN.blit(ALBUM_IMAGES[board[coord]], TILES_RECTS[coord])
 
 
-def blit_all() -> None:
+def blit_outline() -> None:
+    """ blits the outline of the tiles """
+    for i in range(DIMS[0]+1):
+        SCREEN.blit(OUTLINE_VERT, (OUTLINE_RECT.left + (TILE_DIM+TILE_SPACING)*i, OUTLINE_RECT.top))
+    for j in range(DIMS[1]+1):
+        SCREEN.blit(OUTLINE_HORIZ, (OUTLINE_RECT.left, OUTLINE_RECT.top + (TILE_DIM+TILE_SPACING)*j))
+
+
+def blit_all(current_video=None) -> None:
     """ blits all the elements of the game """
     SCREEN.fill('white')
-    SCREEN.blit(OUTLINE, OUTLINE_RECT)
+    if current_video:
+        current_video.draw(SCREEN, VIDEO_COORDS, force_draw=True)
+    blit_outline()
     blit_tiles(GAME.board())
     blit_title()
     blit_score()
@@ -93,11 +115,10 @@ def blit_gameover() -> None:
     SCREEN.blit(gameover, gameover_rect)
 
 
-def blit_loss(current_song) -> None:
+def blit_loss() -> None:
     counter = 0
     while True:
         process_events(only_quit=True)
-        current_song = play_song(current_song)
         blit_all()
         if counter < FPS//4:
             blit_gameover()
@@ -115,14 +136,13 @@ def blit_winner() -> None:
     SCREEN.blit(winner, winner_rect)
 
 
-def blit_won(current_song) -> None:
+def blit_won() -> None:
     img_dim = TILE_DIM*DIMS[0]+TILE_SPACING*(DIMS[0]-1)
     img = pygame.image.load('tiles\ME!.png').convert_alpha()
     img = pygame.transform.scale(img, (img_dim, img_dim))
     counter = 0
     while True:
         process_events(only_quit=True)
-        current_song = play_song(current_song)
         blit_all()
         if counter < FPS//4:
             SCREEN.blit(img, (WIDTH//2-img_dim//2, HEIGHT//2-img_dim//2))
@@ -134,18 +154,18 @@ def blit_won(current_song) -> None:
         CLOCK.tick(FPS)
 
 
-def play_song(current_song) -> str:
+def play_song(current_song) -> any:
     """ plays the song corresponding to the current max score """
     next_song = ALBUMS[GAME.max_tile()]
-    if current_song == '_' or current_song == next_song:
-        return current_song
-    current_song = next_song
-    if current_song == 'END':
-        current_song = 'ME!'
-    pygame.mixer.music.load(f'songs\{current_song}.mp3')
-    pygame.mixer.music.set_volume(0.5)
-    pygame.mixer.music.play()
-    return current_song
+    if current_song == '_' or current_song.path == f'music-videos/{next_song}.mp4':
+        return None
+    if next_song == 'END':
+        next_song = 'ME!'
+    current_color:str = COLORS[GAME.max_tile()]
+    OUTLINE.fill(current_color)
+    OUTLINE_VERT.fill(current_color)
+    OUTLINE_HORIZ.fill(current_color)
+    return Video(f'music-videos/{next_song}.mp4')
 
 
 def process_events(only_quit=False) -> None:
@@ -176,13 +196,17 @@ if __name__ == '__main__':
     # playing the game
     while GAME.is_playable():
         process_events()
-        current_song = play_song(current_song)
-        blit_all()
+        # current_song = play_song(current_song)
+        next_song = play_song(current_video)
+        if next_song:
+            current_video = next_song
+            current_video.set_volume(0.2)
+        blit_all(current_video)
         pygame.display.update()
         CLOCK.tick(FPS)
 
     # keeping the screen active after the game is over
     if GAME.won():
-        blit_won(current_song)
+        blit_won()
     else:
-        blit_loss(current_song)
+        blit_loss()

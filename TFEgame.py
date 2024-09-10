@@ -18,6 +18,8 @@ class TFEgame:
                         2048:'END'}
         self._max_tile = 2
         self._gen_starting_tiles()
+        self.keys = {'w', 'a', 's', 'd'}
+        self.directions = {'w':'up()', 'a':'left()', 's':'down()', 'd':'right()'}
 
     
     def __repr__(self) -> str:
@@ -59,6 +61,7 @@ class TFEgame:
             if key in keys:
                 return key
             if key == 'q':
+                print('quiting game...')
                 sys.exit()
             
     def _do_move(self, m) -> bool:
@@ -92,8 +95,6 @@ class TFEgame:
                 row[first_zero] = elem
 
             return row
-
-        directions = {'a':'left()', 'd':'right()', 'w':'up()', 's':'down()'}
     
         def left() -> bool:
             changed = False
@@ -131,7 +132,7 @@ class TFEgame:
                     changed = True
             return changed
 
-        return eval(directions[m])
+        return eval(self.directions[m])
 
     def move(self, key=None) -> str:
         """ gets user input for the next move """
